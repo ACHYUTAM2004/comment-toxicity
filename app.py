@@ -1,75 +1,73 @@
 import streamlit as st
 import numpy as np
-import tensorflow as tf  # or import your ML framework
+import tensorflow as tf
+from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import TextVectorization
-import gdown
 import os
-from tensorflow.keras.models import load_model  # adjust for your framework
+import gdown
 
-# Define Google Drive file ID and model path
-file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your file ID
-output_path = "model.h5"  # The filename for the downloaded model
+# Define Google Drive file IDs
+model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model file ID
+vocab_file_id = "1utE7JF-ZUaP3wRFV0HL_e1_rhsE5Oe-0"  # Replace with your vocabulary file ID
 
-# Function to download the model from Google Drive
-def download_model(file_id, output_path):
-    url = f"https://drive.google.com/uc?id={file_id}"
+# Define file paths
+model_path = "model.h5"
+vocab_path = "vocabulary.txt"
+
+# Function to download a file from Google Drive
+def download_file(file_id, output_path, description):
     if not os.path.exists(output_path):
-        with st.spinner("Downloading model... This may take a while."):
+        with st.spinner(f"Downloading {description}..."):
+            url = f"https://drive.google.com/uc?id={file_id}"
             gdown.download(url, output_path, quiet=False)
+        st.success(f"{description} downloaded successfully!")
     else:
-        st.info("Model already downloaded.")
+        st.info(f"{description} already exists.")
+
+# Download model and vocabulary
+download_file(model_file_id, model_path, "Model")
+download_file(vocab_file_id, vocab_path, "Vocabulary")
 
 # Load the model
-def load_toxicity_model(path):
-    if os.path.exists(path):
-        return load_model(path)
-    else:
-        st.error("Model file not found.")
-        return None
+model = load_model(model_path)
+
+# Initialize the vectorizer
+MAX_FEATURES = 200000
+vectorizer = TextVectorization(
+    max_tokens=MAX_FEATURES,
+    output_sequence_length=1800,
+    output_mode="int"
+)
+
+# Load vocabulary into the vectorizer
+if os.path.exists(vocab_path):
+    with open(vocab_path, "r") as f:
+        vocab = [line.strip() for line in f.readlines()]
+    vectorizer.set_vocabulary(vocab)
+else:
+    st.error("Vocabulary file not found.")
+
+# Preprocess the input text
+def preprocess_comment(comment):
+    return vectorizer([comment])  # Transform the text input into vectorized form
+
+# Prediction function
+def predict_toxicity(comment):
+    processed_comment = preprocess_comment(comment)
+    prediction = model.predict(processed_comment)
+    return prediction[0]
 
 # Streamlit App
 st.title("Comment Toxicity Classifier")
 
-# Step 1: Download the model
-download_model(file_id, output_path)
+# User input
+user_input = st.text_area("Enter a comment to check for toxicity:", "")
+if user_input:
+    predictions = predict_toxicity(user_input)
 
-# Step 2: Load the model
-model = load_toxicity_model(output_path)
-
-# Load the pre-trained model
-model = load_model('model.h5')  # Replace with your model path
-
-# Define the categories
-categories = ["Toxic", "Severe Toxic", "Obscene", "Threat", "Insult", "Identity Hate"]
-
-def predict_toxicity(comment):
-    # Preprocess the comment (tokenization, padding, etc., as per your model's requirements)
-    processed_comment = preprocess_comment(comment)  # Implement this based on your training
-    prediction = model.predict(processed_comment)
-    return prediction[0]  # Assuming prediction is a 2D array [[...]]; get the first element
-
-def preprocess_comment(comment):
-    MAX_FEATURES = 200000
-    vectorizer = TextVectorization(max_tokens=MAX_FEATURES,
-                               output_sequence_length=1800,
-                               output_mode='int')
-    return vectorizer(comment)
-# Streamlit App Interface
-st.title("Comment Toxicity Classifier")
-st.write("Enter a comment to analyze its toxicity levels across six categories.")
-
-# Input text box
-user_input = st.text_area("Enter your comment:")
-
-if st.button("Analyze"):
-    if user_input.strip():
-        # Get predictions
-        predictions = predict_toxicity(user_input)
-
-        # Display progress bars for each category
-        st.subheader("Toxicity Levels:")
-        for category, value in zip(categories, predictions):
-            st.write(f"{category}: {value * 100:.2f}%")
-            st.progress(value)  # Progress bar takes a value between 0 and 1
-    else:
-        st.error("Please enter a valid comment.")
+    # Display predictions with progress bars
+    categories = ["Toxic", "Severe Toxic", "Obscene", "Threat", "Insult", "Identity Hate"]
+    st.subheader("Toxicity Levels:")
+    for category, score in zip(categories, predictions):
+        st.text(f"{category}: {score * 100:.2f}%")
+        st.progress(score)
