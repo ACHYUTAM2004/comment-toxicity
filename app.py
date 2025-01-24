@@ -37,7 +37,7 @@ download_model(file_id, output_path)
 model = load_toxicity_model(output_path)
 
 # Load the pre-trained model
-model = load_model('path_to_your_model.h5')  # Replace with your model path
+model = load_model('model.h5')  # Replace with your model path
 
 # Define the categories
 categories = ["Toxic", "Severe Toxic", "Obscene", "Threat", "Insult", "Identity Hate"]
