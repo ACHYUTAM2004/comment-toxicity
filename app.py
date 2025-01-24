@@ -7,7 +7,7 @@ import os
 from tensorflow.keras.models import load_model  # adjust for your framework
 
 # Define Google Drive file ID and model path
-file_id = "your_file_id_here"  # Replace with your file ID
+file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your file ID
 output_path = "model.h5"  # The filename for the downloaded model
 
 # Function to download the model from Google Drive
