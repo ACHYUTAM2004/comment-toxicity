@@ -53,7 +53,7 @@ def preprocess_comment(comment):
     vectorizer = TextVectorization(max_tokens=MAX_FEATURES,
                                output_sequence_length=1800,
                                output_mode='int')
-    return vectorizer([comment])
+    return vectorizer(comment)
 # Streamlit App Interface
 st.title("Comment Toxicity Classifier")
 st.write("Enter a comment to analyze its toxicity levels across six categories.")
