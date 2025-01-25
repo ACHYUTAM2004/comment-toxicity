@@ -5,26 +5,44 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import TextVectorization
 import os
 import gdown
-import requests
+from supabase import create_client, Client
 
+# Supabase Configuration
+SUPABASE_URL = "your-supabase-url"  # Replace with your Supabase URL
+SUPABASE_KEY = "your-supabase-key"  # Replace with your Supabase Service Role Key
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Function to download the model from Google Drive
 def download_model():
-    url = "https://drive.google.com/uc?export=download&id=1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model's Google Drive URL
-    output = "Trained_model.h5"  # Local path where the model will be saved
-    gdown.download(url, output, quiet=False)
+    model_path = "Trained_model.h5"
+    if not os.path.exists(model_path):  # Check if the model file already exists
+        url = "https://drive.google.com/uc?export=download&id=1fHukySE-W312ezuiWMfaCDanY6lGWOk8"
+        gdown.download(url, model_path, quiet=False)
+    else:
+        st.info("Model already exists locally.")
+    return model_path
 
-# Function to load the model after downloading it
-def load_model_from_drive():
-    download_model()  # Download the model from Google Drive
-    model = tf.keras.models.load_model("Trained_model.h5")  # Load the model
-    return model
+# Function to fetch the vocabulary from Supabase
+def fetch_vocab():
+    response = supabase.storage.from_("your-bucket-name").download("path/to/vocab.txt")
+    if response:
+        vocab_content = response.decode("utf-8")  # Decode the byte content to a string
+        vocab_list = vocab_content.splitlines()  # Convert to a list of words
+        return vocab_list
+    else:
+        st.error("Failed to fetch vocabulary from Supabase.")
+        return []
 
-# Example usage:
-model = load_model_from_drive()
+# Function to initialize the TextVectorization layer
+def initialize_vectorizer(vocab):
+    vectorizer = TextVectorization(max_tokens=20000, output_sequence_length=200, vocabulary=vocab)
+    return vectorizer
 
-# Now you can use the `model` for predictions
-print("Model loaded successfully!")
+# Load the model and vocabulary
+model_path = download_model()
+model = load_model(model_path)
+vocab = fetch_vocab()
+vectorizer = initialize_vectorizer(vocab) if vocab else None
 
 # Preprocess function
 def preprocess_comment(comment):
