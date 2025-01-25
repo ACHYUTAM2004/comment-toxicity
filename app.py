@@ -7,18 +7,15 @@ import os
 import gdown
 import requests
 
-def download_vocab_from_supabase(url, output_path="vocabulary.txt"):
+# Fetch vocabulary directly from Supabase
+def fetch_vocab_from_supabase(url):
     response = requests.get(url)
-    with open(output_path, "wb") as f:
-        f.write(response.content)
+    vocab = response.text.splitlines()
+    return vocab
 
 # Supabase public URL for the vocabulary
 vocab_url = "https://vbgxuijebobixzrqgvys.supabase.co/storage/v1/object/public/sentiment/vocabulary.txt?t=2025-01-25T07%3A26%3A16.079Z"
-download_vocab_from_supabase(vocab_url)
-
-# Load vocabulary into vectorizer
-with open("vocabulary.txt", "r") as f:
-    vocab = [line.strip() for line in f]
+vocab = fetch_vocab_from_supabase(vocab_url)
 
 # Initialize the vectorizer
 MAX_FEATURES = 200000
