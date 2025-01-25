@@ -31,7 +31,7 @@ def load_vocab_from_file(file_path):
 # Initialize TextVectorization globally
 try:
     vocab_file_path = "vocabulary.txt"
-    vocab = load_vocab_from_file(vocab_file_pa)
+    vocab = load_vocab_from_file(vocab_file_path)
 
     # Configure TextVectorization layer
     MAX_FEATURES = 200000
