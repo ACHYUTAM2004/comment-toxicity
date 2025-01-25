@@ -15,7 +15,7 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # Initialize Supabase client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Function to download file from Supabase bucket
+# Download vocabulary file from bucket
 def download_file_from_bucket(bucket_name, file_path, local_output_path):
     try:
         response = supabase.storage.from_(bucket_name).download(file_path)
@@ -28,33 +28,40 @@ def download_file_from_bucket(bucket_name, file_path, local_output_path):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-# Example usage to download vocabulary
+# Example: Download vocabulary
 bucket_name = "sentiment"
-vocab_file_path = "vocabulary.txt"  # Path in Supabase bucket
-local_vocab_path = "vocabulary.txt"  # Save locally
+file_path = "vocabulary.txt"
+local_output_path = "vocabulary.txt"
+download_file_from_bucket(bucket_name, file_path, local_output_path)
 
-download_file_from_bucket(bucket_name, vocab_file_path, local_vocab_path)
-
-# Function to load vocabulary from file
+# Load vocabulary
 def load_vocab_from_file(file_path):
     with open(file_path, "r") as file:
         vocab = [line.strip() for line in file.readlines()]
     return vocab
 
-# Load vocabulary into TextVectorization layer
-MAX_FEATURES = 200000
-vectorizer = TextVectorization(
-    max_tokens=MAX_FEATURES,
-    output_sequence_length=1800,
-    output_mode="int"
-)
+# Initialize TextVectorization globally
+try:
+    vocab_file_path = "vocabulary.txt"
+    vocab = load_vocab_from_file(vocab_file_path)
 
-vocab = load_vocab_from_file(local_vocab_path)
-vectorizer.set_vocabulary(vocab)
+    # Configure TextVectorization layer
+    MAX_FEATURES = 200000
+    vectorizer = TextVectorization(
+        max_tokens=MAX_FEATURES,
+        output_sequence_length=1800,
+        output_mode="int"
+    )
+    vectorizer.set_vocabulary(vocab)  # Assign vocabulary
+    st.info("Vocabulary successfully loaded into TextVectorization layer!")
+except Exception as e:
+    st.error(f"Failed to initialize vectorizer: {e}")
+    vectorizer = None  # Fallback if initialization fails
 
-print("Vocabulary successfully loaded into TextVectorization layer!")
+# Define Google Drive model file download
+model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"
+model_path = "model.h5"
 
-# Function to download file from Google Drive
 def download_file(file_id, output_path, description):
     if not os.path.exists(output_path):
         with st.spinner(f"Downloading {description}..."):
@@ -64,45 +71,44 @@ def download_file(file_id, output_path, description):
     else:
         st.info(f"{description} already exists.")
 
-# Define file paths
-model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Google Drive file ID for model
-model_path = "model.h5"
-
-# Download the model
+# Download model
 download_file(model_file_id, model_path, "Model")
-
-# Load the model
 model = load_model(model_path)
 
-# Preprocess input text using TextVectorization layer
+# Preprocess function
 def preprocess_comment(comment):
-    return vectorizer([comment])  # Vectorize input text
+    if vectorizer:
+        return vectorizer([comment])  # Use vectorizer globally
+    else:
+        st.error("Vectorizer is not initialized. Cannot process comments.")
+        return None
 
 # Prediction function
-categories = ["Toxic", "Severe Toxic", "Obscene", "Threat", "Insult", "Identity Hate"]
-
 def predict_toxicity(comment):
     processed_comment = preprocess_comment(comment)
-    prediction = model.predict(processed_comment)
-    return prediction[0]
+    if processed_comment is not None:
+        prediction = model.predict(processed_comment)
+        return prediction[0]
+    else:
+        return []
 
-# Streamlit App
+# Streamlit app
 st.title("Comment Toxicity Classifier")
+categories = ["Toxic", "Severe Toxic", "Obscene", "Threat", "Insult", "Identity Hate"]
 
-# User input
-user_input = st.text_area("Enter a comment to check for toxicity:", "")
+user_input = st.text_area("Enter a comment to check for toxicity:")
 if st.button("Analyze"):
     if user_input.strip():
         if model:
-            # Get predictions
             predictions = predict_toxicity(user_input)
-
-            # Display progress bars for each category
-            st.subheader("Toxicity Levels:")
-            for category, value in zip(categories, predictions):
-                st.write(f"{category}: {value * 100:.2f}%")
-                st.progress(value)  # Progress bar takes a value between 0 and 1
+            if predictions:
+                st.subheader("Toxicity Levels:")
+                for category, value in zip(categories, predictions):
+                    st.write(f"{category}: {value * 100:.2f}%")
+                    st.progress(value)
+            else:
+                st.error("Prediction failed. Please check the input.")
         else:
-            st.error("Model could not be loaded. Please try again.")
+            st.error("Model could not be loaded.")
     else:
         st.error("Please enter a valid comment.")
