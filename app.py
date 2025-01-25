@@ -7,44 +7,6 @@ import os
 import gdown
 import requests
 
-def download_vocab_from_github(url, output_path):
-    response = requests.get(url)
-    if response.status_code == 200:
-        with open(output_path, "w") as file:
-            file.write(response.text)
-        print(f"Vocabulary file downloaded successfully to {output_path}")
-    else:
-        print(f"Failed to download file. Status code: {response.status_code}")
-
-# URL of the vocab.txt file on GitHub (raw format)
-vocab_url = "https://raw.githubusercontent.com/ACHYUTAM2004/comment-toxicity/refs/heads/main/vocabulary.txt"
-local_output_path = "vocabulary.txt"
-
-download_vocab_from_github(vocab_url, local_output_path)
-
-# Load the vocabulary after downloading
-def load_vocab_from_file(file_path):
-    with open(file_path, "r") as file:
-        vocab = [line.strip() for line in file.readlines()]
-    return vocab
-
-# Initialize TextVectorization globally
-try:
-    vocab_file_path = "vocabulary.txt"
-    vocab = load_vocab_from_file(vocab_file_path)
-
-    # Configure TextVectorization layer
-    MAX_FEATURES = 200000
-    vectorizer = TextVectorization(
-        max_tokens=MAX_FEATURES,
-        output_sequence_length=1800,
-        output_mode="int"
-    )
-    vectorizer.set_vocabulary(vocab)  # Assign vocabulary
-    st.info("Vocabulary successfully loaded into TextVectorization layer!")
-except Exception as e:
-    st.error(f"Failed to initialize vectorizer: {e}")
-    vectorizer = None  # Fallback if initialization fails
 
 # Function to download the model from Google Drive
 def download_model():
