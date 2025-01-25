@@ -1,4 +1,4 @@
-###**Comment Toxicity Classification App** 💬  
+**Comment Toxicity Classification App** 💬  
 - **Overview:**  
   An advanced deep learning-based app designed to classify text comments into various categories of toxicity, including hate speech, offensive language, and harassment. The app helps in moderating online platforms by identifying harmful content and ensuring safer user interactions.  
 
