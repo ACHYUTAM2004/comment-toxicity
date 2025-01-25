@@ -30,7 +30,7 @@ def download_file_from_bucket(bucket_name, file_path, local_output_path):
 
 # Example: Download vocabulary
 bucket_name = "sentiment"
-file_path = "vocabulary.txt"
+file_path = "vocabulary/vocabulary.txt"
 local_output_path = "vocabulary.txt"
 download_file_from_bucket(bucket_name, file_path, local_output_path)
 
