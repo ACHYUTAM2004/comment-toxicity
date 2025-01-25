@@ -15,13 +15,11 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # Initialize Supabase client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# Function to download file from Supabase bucket
 def download_file_from_bucket(bucket_name, file_path, local_output_path):
     try:
-        # Download the file
         response = supabase.storage.from_(bucket_name).download(file_path)
-        
         if response:
-            # Save the file locally
             with open(local_output_path, "wb") as file:
                 file.write(response)
             print(f"File downloaded successfully: {local_output_path}")
@@ -30,45 +28,33 @@ def download_file_from_bucket(bucket_name, file_path, local_output_path):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-# Example usage
+# Example usage to download vocabulary
 bucket_name = "sentiment"
-file_path = "vocabulary.txt"  # Path to the file in the bucket
-local_output_path = "vocabulary.txt"  # Local file name to save as
+vocab_file_path = "vocabulary.txt"  # Path in Supabase bucket
+local_vocab_path = "vocabulary.txt"  # Save locally
 
-download_file_from_bucket(bucket_name, file_path, local_output_path)
+download_file_from_bucket(bucket_name, vocab_file_path, local_vocab_path)
 
-# Read the vocabulary file
+# Function to load vocabulary from file
 def load_vocab_from_file(file_path):
     with open(file_path, "r") as file:
-        vocab = [line.strip() for line in file.readlines()]  # Read and strip newlines
+        vocab = [line.strip() for line in file.readlines()]
     return vocab
 
-# File path to the downloaded vocabulary file
-vocab_file_path = "vocabulary.txt"
-
-# Load the vocabulary
-vocab = load_vocab_from_file(vocab_file_path)
-
-# Set up the TextVectorization layer
-MAX_FEATURES = 200000  # Maximum number of tokens
+# Load vocabulary into TextVectorization layer
+MAX_FEATURES = 200000
 vectorizer = TextVectorization(
     max_tokens=MAX_FEATURES,
-    output_sequence_length=1800,  # Sequence length
+    output_sequence_length=1800,
     output_mode="int"
 )
 
-# Assign the vocabulary to the TextVectorization layer
+vocab = load_vocab_from_file(local_vocab_path)
 vectorizer.set_vocabulary(vocab)
 
 print("Vocabulary successfully loaded into TextVectorization layer!")
 
-# Define Google Drive file IDs
-model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model file ID
-
-# Define file paths
-model_path = "model.h5"
-
-# Function to download a file from Google Drive
+# Function to download file from Google Drive
 def download_file(file_id, output_path, description):
     if not os.path.exists(output_path):
         with st.spinner(f"Downloading {description}..."):
@@ -78,17 +64,23 @@ def download_file(file_id, output_path, description):
     else:
         st.info(f"{description} already exists.")
 
-# Download model and vocabulary
+# Define file paths
+model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Google Drive file ID for model
+model_path = "model.h5"
+
+# Download the model
 download_file(model_file_id, model_path, "Model")
 
 # Load the model
 model = load_model(model_path)
 
-# Preprocess the input text
+# Preprocess input text using TextVectorization layer
 def preprocess_comment(comment):
-    return vectorizer([comment])  # Transform the text input into vectorized form
+    return vectorizer([comment])  # Vectorize input text
 
 # Prediction function
+categories = ["Toxic", "Severe Toxic", "Obscene", "Threat", "Insult", "Identity Hate"]
+
 def predict_toxicity(comment):
     processed_comment = preprocess_comment(comment)
     prediction = model.predict(processed_comment)
