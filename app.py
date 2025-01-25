@@ -46,22 +46,23 @@ except Exception as e:
     st.error(f"Failed to initialize vectorizer: {e}")
     vectorizer = None  # Fallback if initialization fails
 
-# Define Google Drive model file download
-model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"
-model_path = "model.h5"
+# Function to download the model from Google Drive
+def download_model():
+    url = "https://drive.google.com/uc?export=download&id=1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model's Google Drive URL
+    output = "Trained_model.h5"  # Local path where the model will be saved
+    gdown.download(url, output, quiet=False)
 
-def download_file(file_id, output_path, description):
-    if not os.path.exists(output_path):
-        with st.spinner(f"Downloading {description}..."):
-            url = f"https://drive.google.com/uc?id={file_id}"
-            gdown.download(url, output_path, quiet=False)
-        st.success(f"{description} downloaded successfully!")
-    else:
-        st.info(f"{description} already exists.")
+# Function to load the model after downloading it
+def load_model_from_drive():
+    download_model()  # Download the model from Google Drive
+    model = tf.keras.models.load_model("Trained_model.h5")  # Load the model
+    return model
 
-# Download model
-download_file(model_file_id, model_path, "Model")
-model = load_model(model_path)
+# Example usage:
+model = load_model_from_drive()
+
+# Now you can use the `model` for predictions
+print("Model loaded successfully!")
 
 # Preprocess function
 def preprocess_comment(comment):
