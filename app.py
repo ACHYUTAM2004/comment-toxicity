@@ -8,8 +8,8 @@ import gdown
 from supabase import create_client, Client
 
 # Supabase Configuration
-SUPABASE_URL = "your-supabase-url"  # Replace with your Supabase URL
-SUPABASE_KEY = "your-supabase-key"  # Replace with your Supabase Service Role Key
+SUPABASE_URL = "https://vbgxuijebobixzrqgvys.supabase.co"  # Replace with your Supabase URL
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZ3h1aWplYm9iaXh6cnFndnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4ODk1MjIsImV4cCI6MjA1MTQ2NTUyMn0.xchbHvyHL3Y1EQ5SQbKMA--CtVlRXsPNUieXTSRZYPY"  # Replace with your Supabase Service Role Key
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Function to download the model from Google Drive
@@ -24,7 +24,7 @@ def download_model():
 
 # Function to fetch the vocabulary from Supabase
 def fetch_vocab():
-    response = supabase.storage.from_("your-bucket-name").download("path/to/vocab.txt")
+    response = supabase.storage.from_("sentiment").download("vocabulary/vocab.txt")
     if response:
         vocab_content = response.decode("utf-8")  # Decode the byte content to a string
         vocab_list = vocab_content.splitlines()  # Convert to a list of words
