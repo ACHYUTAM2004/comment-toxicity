@@ -19,6 +19,14 @@ download_vocab_from_supabase(vocab_url)
 # Load vocabulary into vectorizer
 with open("vocabulary.txt", "r") as f:
     vocab = [line.strip() for line in f]
+
+# Initialize the vectorizer
+MAX_FEATURES = 200000
+vectorizer = TextVectorization(
+    max_tokens=MAX_FEATURES,
+    output_sequence_length=1800,
+    output_mode="int"
+)
 vectorizer.set_vocabulary(vocab)
 
 
@@ -43,14 +51,6 @@ download_file(model_file_id, model_path, "Model")
 
 # Load the model
 model = load_model(model_path)
-
-# Initialize the vectorizer
-MAX_FEATURES = 200000
-vectorizer = TextVectorization(
-    max_tokens=MAX_FEATURES,
-    output_sequence_length=1800,
-    output_mode="int"
-)
 
 # Preprocess the input text
 def preprocess_comment(comment):
