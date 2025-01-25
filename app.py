@@ -7,28 +7,6 @@ import os
 import gdown
 import requests
 
-# Fetch vocabulary directly from Supabase
-def fetch_vocab_from_supabase(url):
-    response = requests.get(url)
-    vocab = response.text.splitlines()
-    return vocab
-
-# Supabase public URL for the vocabulary
-vocab_url = "https://vbgxuijebobixzrqgvys.supabase.co/storage/v1/object/public/sentiment/vocabulary.txt?t=2025-01-25T07%3A26%3A16.079Z"
-vocab = fetch_vocab_from_supabase(vocab_url)
-
-# Initialize the vectorizer
-MAX_FEATURES = 200000
-vectorizer = TextVectorization(
-    max_tokens=MAX_FEATURES,
-    output_sequence_length=1800,
-    output_mode="int"
-)
-vectorizer.set_vocabulary(vocab)
-
-
-# Define Google Drive file IDs
-model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model file ID
 
 def download_model():
     url = "https://drive.google.com/file/d/1fHukySE-W312ezuiWMfaCDanY6lGWOk8/view?usp=sharing"
