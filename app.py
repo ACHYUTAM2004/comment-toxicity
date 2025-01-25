@@ -21,24 +21,16 @@ vectorizer.set_vocabulary(vocab)
 # Define Google Drive file IDs
 model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model file ID
 
-# Define file paths
-model_path = "model.h5"
-
-# Function to download a file from Google Drive
-def download_file(file_id, output_path, description):
-    if not os.path.exists(output_path):
-        with st.spinner(f"Downloading {description}..."):
-            url = f"https://drive.google.com/uc?id={file_id}"
-            gdown.download(url, output_path, quiet=False)
-        st.success(f"{description} downloaded successfully!")
-    else:
-        st.info(f"{description} already exists.")
-
-# Download model and vocabulary
-download_file(model_file_id, model_path, "Model")
-
-# Load the model
-model = load_model(model_path)
+def download_model():
+    url = "https://drive.google.com/file/d/1fHukySE-W312ezuiWMfaCDanY6lGWOk8/view?usp=sharing"
+    output = "Trained_model.h5"
+    gdown.download(url, output, quiet=False)
+    
+# Load the model after downloading
+def load_model():
+    download_model()
+    model = tf.keras.models.load_model("Trained_model.h5")
+    return model
 
 # Preprocess the input text
 def preprocess_comment(comment):
