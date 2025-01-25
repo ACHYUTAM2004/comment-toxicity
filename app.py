@@ -37,6 +37,30 @@ local_output_path = "vocabulary.txt"  # Local file name to save as
 
 download_file_from_bucket(bucket_name, file_path, local_output_path)
 
+# Read the vocabulary file
+def load_vocab_from_file(file_path):
+    with open(file_path, "r") as file:
+        vocab = [line.strip() for line in file.readlines()]  # Read and strip newlines
+    return vocab
+
+# File path to the downloaded vocabulary file
+vocab_file_path = "vocabulary.txt"
+
+# Load the vocabulary
+vocab = load_vocab_from_file(vocab_file_path)
+
+# Set up the TextVectorization layer
+MAX_FEATURES = 200000  # Maximum number of tokens
+vectorizer = TextVectorization(
+    max_tokens=MAX_FEATURES,
+    output_sequence_length=1800,  # Sequence length
+    output_mode="int"
+)
+
+# Assign the vocabulary to the TextVectorization layer
+vectorizer.set_vocabulary(vocab)
+
+print("Vocabulary successfully loaded into TextVectorization layer!")
 
 # Define Google Drive file IDs
 model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model file ID
