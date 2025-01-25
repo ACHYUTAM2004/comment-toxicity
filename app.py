@@ -5,14 +5,28 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import TextVectorization
 import os
 import gdown
+import requests
+
+def download_vocab_from_supabase(url, output_path="vocabulary.txt"):
+    response = requests.get(url)
+    with open(output_path, "wb") as f:
+        f.write(response.content)
+
+# Supabase public URL for the vocabulary
+vocab_url = "https://vbgxuijebobixzrqgvys.supabase.co/storage/v1/object/public/sentiment/vocabulary.txt?t=2025-01-25T07%3A26%3A16.079Z"
+download_vocab_from_supabase(vocab_url)
+
+# Load vocabulary into vectorizer
+with open("vocabulary.txt", "r") as f:
+    vocab = [line.strip() for line in f]
+vectorizer.set_vocabulary(vocab)
+
 
 # Define Google Drive file IDs
 model_file_id = "1fHukySE-W312ezuiWMfaCDanY6lGWOk8"  # Replace with your model file ID
-vocab_file_id = "1utE7JF-ZUaP3wRFV0HL_e1_rhsE5Oe-0"  # Replace with your vocabulary file ID
 
 # Define file paths
 model_path = "model.h5"
-vocab_path = "vocabulary.txt"
 
 # Function to download a file from Google Drive
 def download_file(file_id, output_path, description):
@@ -26,7 +40,6 @@ def download_file(file_id, output_path, description):
 
 # Download model and vocabulary
 download_file(model_file_id, model_path, "Model")
-download_file(vocab_file_id, vocab_path, "Vocabulary")
 
 # Load the model
 model = load_model(model_path)
@@ -38,14 +51,6 @@ vectorizer = TextVectorization(
     output_sequence_length=1800,
     output_mode="int"
 )
-
-# Load vocabulary into the vectorizer
-if os.path.exists(vocab_path):
-    with open(vocab_path, "r") as f:
-        vocab = [line.strip() for line in f.readlines()]
-    vectorizer.set_vocabulary(vocab)
-else:
-    st.error("Vocabulary file not found.")
 
 # Preprocess the input text
 def preprocess_comment(comment):
