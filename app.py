@@ -5,36 +5,24 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import TextVectorization
 import os
 import gdown
-from supabase import create_client, Client
-import os
+import requests
 
-# Replace these with your Supabase project details
-SUPABASE_URL = "https://vbgxuijebobixzrqgvys.supabase.co"  # Your Supabase project URL
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZ3h1aWplYm9iaXh6cnFndnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4ODk1MjIsImV4cCI6MjA1MTQ2NTUyMn0.xchbHvyHL3Y1EQ5SQbKMA--CtVlRXsPNUieXTSRZYPY"  # Your Supabase service role key (or API key)
+def download_vocab_from_github(url, output_path):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(output_path, "w") as file:
+            file.write(response.text)
+        print(f"Vocabulary file downloaded successfully to {output_path}")
+    else:
+        print(f"Failed to download file. Status code: {response.status_code}")
 
-# Initialize Supabase client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-# Download vocabulary file from bucket
-def download_file_from_bucket(bucket_name, file_path, local_output_path):
-    try:
-        response = supabase.storage.from_(bucket_name).download(file_path)
-        if response:
-            with open(local_output_path, "wb") as file:
-                file.write(response)
-            print(f"File downloaded successfully: {local_output_path}")
-        else:
-            print(f"Failed to download file: {file_path}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-# Example: Download vocabulary
-bucket_name = "sentiment"
-file_path = "vocabulary/vocabulary.txt"
+# URL of the vocab.txt file on GitHub (raw format)
+vocab_url = "https://raw.githubusercontent.com/ACHYUTAM2004/comment-toxicity/refs/heads/main/vocabulary.txt"
 local_output_path = "vocabulary.txt"
-download_file_from_bucket(bucket_name, file_path, local_output_path)
 
-# Load vocabulary
+download_vocab_from_github(vocab_url, local_output_path)
+
+# Load the vocabulary after downloading
 def load_vocab_from_file(file_path):
     with open(file_path, "r") as file:
         vocab = [line.strip() for line in file.readlines()]
@@ -43,7 +31,7 @@ def load_vocab_from_file(file_path):
 # Initialize TextVectorization globally
 try:
     vocab_file_path = "vocabulary.txt"
-    vocab = load_vocab_from_file(vocab_file_path)
+    vocab = load_vocab_from_file(vocab_file_pa)
 
     # Configure TextVectorization layer
     MAX_FEATURES = 200000
