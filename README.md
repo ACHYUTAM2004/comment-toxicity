@@ -1,6 +1,5 @@
 # Comment Toxicity Classification App 💬
 
-
 ---
 
 ## Table of Contents
@@ -69,12 +68,13 @@ By automating toxicity detection, this tool contributes to healthier online inte
 ## Live Demo
 Experience the application in action on Hugging Face Spaces: [**Live Demo**](https://huggingface.co/spaces/ad-2004/comment-toxicity-analyser)
 
----
 
----
+ ![image](https://github.com/user-attachments/assets/e9a9360e-2c0a-4bc7-b7ac-56d0116053cb)
 
+--- 
+ 
 Feel free to contribute, report issues, or suggest improvements!
 
 
-  ![image](https://github.com/user-attachments/assets/e9a9360e-2c0a-4bc7-b7ac-56d0116053cb)
+ 
 
