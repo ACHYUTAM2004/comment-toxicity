@@ -42,7 +42,7 @@ This deep learning-based application classifies text comments into various toxic
 1) To get started, clone the repository using `git clone https://github.com/your-repo/comment-toxicity-analyser.git` and navigate into the directory.
 2) Next, create and activate a virtual environment (use `python -m venv venv` and activate it using `source venv/bin/activate` for macOS/Linux or `venv\Scripts\activate` for Windows).
 3) Then, install the dependencies with `pip install -r requirements.txt`.
-4) If you want to download the trained model, here is the gdrive link for the model [https://drive.google.com/file/d/19sR7F2iiyND4bhKaQDYNm5f-cN4c3nq_/view?usp=drive_link](#)
+4) If you want to download the trained model, here is the gdrive link for the model [https://drive.google.com/file/d/19sR7F2iiyND4bhKaQDYNm5f-cN4c3nq_/view?usp=drive_link]
 
 ---
 
