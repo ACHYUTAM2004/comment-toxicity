@@ -8,18 +8,20 @@ import gdown
 from supabase import create_client, Client
 
 # Supabase Configuration
-SUPABASE_URL = "https://vbgxuijebobixzrqgvys.supabase.co"  # Replace with your Supabase URL
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZ3h1aWplYm9iaXh6cnFndnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4ODk1MjIsImV4cCI6MjA1MTQ2NTUyMn0.xchbHvyHL3Y1EQ5SQbKMA--CtVlRXsPNUieXTSRZYPY"  # Replace with your Supabase Service Role Key
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Function to download the model from Google Drive
 def download_model():
     model_path = "Trained_model.h5"
-    if not os.path.exists(model_path):  # Check if the model file already exists
-        url = "https://drive.google.com/uc?export=download&id=1fHukySE-W312ezuiWMfaCDanY6lGWOk8"
+    
+    if not os.path.exists(model_path):
+        url = "https://drive.google.com/uc?id=19sR7F2iiyND4bhKaQDYNm5f-cN4c3nq_"
         gdown.download(url, model_path, quiet=False)
     else:
         st.info("Model already exists locally.")
+        
     return model_path
 
 # Function to fetch the vocabulary from Supabase
