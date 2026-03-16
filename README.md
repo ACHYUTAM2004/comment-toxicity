@@ -2,7 +2,6 @@
 
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow?style=for-the-badge)](https://huggingface.co/spaces/ad-2004/comment-toxicity-analyser)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg?style=for-the-badge\&logo=python)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-App-red?style=for-the-badge\&logo=streamlit)](https://streamlit.io/)
 
 This deep learning-based application classifies text comments into various toxicity categories—including hate speech, offensive language, and harassment. Built to help moderate online platforms, it filters harmful content in real-time to ensure safer interactions.
 
